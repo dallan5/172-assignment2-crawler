@@ -104,8 +104,19 @@ def is_valid(url):
         if ILLEGAL_EXTENSIONS.match(path):
             return False
 
+        # extra: avoid obvious traps
+        if len(path) > 300:
+            return False
+        if path.count("/") > 10:
+            return False
+        if any(tok in path for tok in ("/calendar/", "/events/", "/wp-json/", "/cgi-bin/")):
+            return False
+        if any(tok in path for tok in (";jsessionid=", "sessionid", "phpsessid")):
+            return False
+
         return True
 
     except Exception:
         return False
+
 
