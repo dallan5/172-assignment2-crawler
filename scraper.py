@@ -62,7 +62,8 @@ def extract_next_links(url, resp):
 ILLEGAL_EXTENSIONS = re.compile(
     r".*\.(css|js|bmp|gif|jpe?g|ico|png|tiff?|svg|webp|"
     r"mid|mp2|mp3|mp4|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|webm|"
-    r"pdf|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|"
+    r"wmv|flv|"
+    r"pdf|ps|eps|tex|ppt|pptx|pps|ppsx|doc|docx|xls|xlsx|"
     r"zip|rar|gz|tgz|bz2|7z|tar|"
     r"exe|msi|bin|dmg|iso|dll|"
     r"csv|tsv|arff|rtf|jar|war)$",
@@ -70,7 +71,7 @@ ILLEGAL_EXTENSIONS = re.compile(
 )
 
 def is_valid(url):
-    # Decide whether to crawl this url or not. 
+    # Decide whether to crawl this url or not.
     # If you decide to crawl it, return True; otherwise return False.
     # There are already some conditions that return False.
     try:
@@ -81,7 +82,7 @@ def is_valid(url):
 
         if p.scheme not in ("http", "https"):
             return False
-        
+
         if p.query:
             return False
 
@@ -104,6 +105,11 @@ def is_valid(url):
         if ILLEGAL_EXTENSIONS.match(path):
             return False
 
+        # robots.txt disallowed prefixes
+        DISALLOWED_PREFIXES = ("/people", "/happening")
+        if any(path == pref or path.startswith(pref + "/") for pref in DISALLOWED_PREFIXES):
+            return False
+
         # extra: avoid obvious traps
         if len(path) > 300:
             return False
@@ -118,5 +124,7 @@ def is_valid(url):
 
     except Exception:
         return False
+
+
 
 
