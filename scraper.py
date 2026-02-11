@@ -85,11 +85,18 @@ def is_valid(url):
         if p.query:
             return False
 
-        host = (p.hostname or "").lower()
+        host = (p.hostname or "").lower().rstrip(".")
         if host.startswith("www."):
             host = host[4:]
 
-        if host != "ics.uci.edu" and not host.endswith(".ics.uci.edu"):
+        ALLOWED_HOSTS = {
+            "ics.uci.edu",
+            "cs.uci.edu",
+            "informatics.uci.edu",
+            "stat.uci.edu",
+        }
+
+        if host not in ALLOWED_HOSTS:
             return False
 
         # spec #1: filter non-web pages by extension
@@ -101,3 +108,4 @@ def is_valid(url):
 
     except Exception:
         return False
+
